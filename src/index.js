@@ -1,17 +1,58 @@
-import React from 'react';
+import React, { createContext } from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+
+import UserStore from './store/Userstore';
+import ProductStore from './store/ProductStore';
+import RecipeStore from './store/RecipeStore';
+import PositionStore from './store/PositionStore';
+import OrderStore from './store/OrderStore';
+
+import styled, { createGlobalStyle } from 'styled-components';
+
+import MontserratTtf from "./static/fonts/MontserratAlternates-Medium.ttf";
+
+
+export const Context = createContext(null)
+
+const FontStyle = createGlobalStyle`
+@font-face {
+  font-family: Montserrat-Alternates-Meduim;
+  src: url(${MontserratTtf}) format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+`
+
+const Global = createGlobalStyle`
+  html, body {height:100%; width:100%; margin:0; padding:0;}
+
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Montserrat-Alternates-Meduim, sans-serif;
+  }
+
+  #root {
+    min-height: 100%;
+  }
+`
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Context.Provider value={{
+      usersStore: new UserStore(),
+      productsStore: new ProductStore(),
+      recipesStore: new RecipeStore(),
+      positionsStore: new PositionStore(),
+      ordersStore: new OrderStore()
+    }}>
+      <Global />
+      <FontStyle />
+      <App />
+    </Context.Provider>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
