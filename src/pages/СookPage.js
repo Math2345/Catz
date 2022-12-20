@@ -1,16 +1,20 @@
 import { observer } from "mobx-react-lite";
-import React, {useState, useContext, useEffect, useRef} from "react";
+import React, { useState, useContext, useEffect} from "react";
 import { Context } from "..";
 
+import { Formik, Field } from 'formik'
+
 //http
-import { findAllProducts } from "../http/ProductApi"; 
-import { saveRecipe, findAll} from "../http/RecipeApi";
+import { findAllProducts, push } from "../http/ProductApi";
+import { saveRecipe, findAll } from "../http/RecipeApi";
 import { savePosition } from "../http/PositionApi";
 
 // modal
 import Modal from "../components/Modal/Modal";
 
 // ui
+import Title from "../components/UI/Title";
+import SelectMultuple from "../components/UI/SelectMultuple";
 import SubTitle from "../components/UI/Subtitle";
 import Image from "../components/UI/Image";
 import Input from "../components/UI/Input";
@@ -20,6 +24,8 @@ import Button from "../components/UI/Button";
 // logo
 import LogoImg from "../static/image/logo.svg"
 
+import "../styles/custom.css"
+
 import {
     HeaderWr,
     LogoWr,
@@ -27,29 +33,33 @@ import {
     StyledModalContent,
     StyledModalTitle,
     StyledLabelText,
-    Div
-} 
-from "../styles/styles"
+    StyledError
+}
+    from "../styles/styles"
 
 // container
 import ProductList from "../components/ProductList";
 import RecipeList from "../components/RecipeList";
 
-import Title from "../components/UI/Title";
-import { set } from "mobx";
+import { validationsSchemaRecipe, validationsSchemaPosition } from "../utils/consts";
+
 
 const CookPage = observer(() => {
-    const {productsStore} = useContext(Context)
-    const {recipesStore} = useContext(Context)
-    const {positionsStore} = useContext(Context)
+    const { productsStore } = useContext(Context)
+    const { recipesStore } = useContext(Context)
 
     const [modalActiveProduct, setModalActiveProduct] = useState(false)
     const [modalActivePosition, setModalActivePosition] = useState(false)
 
+    //products 
+    const [products, setProducts] = useState([])
+
+    //recipes
+    const [recipes, setRecipes] = useState([])
+
     // recipes
     const [recipeTitle, setRecipeTitle] = useState('')
     const [recipeDescription, setRecipeDescription] = useState('')
-    const [selectedProducts, setSelectedProducts] = useState([])
 
     //position
     const [positionTitle, setPositionTitle] = useState('')
@@ -63,85 +73,106 @@ const CookPage = observer(() => {
     }, [])
 
 
-    const selectedProductsByClick = (e) => {
-        const elem = e.currentTarget;
+    // получить список рецептов
+    const getListProducts = () => {
+        const _products = productsStore.products.map((product) => {
+            return { id: product.id, value: product.name, label: product.name,  count: product.count }
+        })
 
-        const title = elem.children[2].innerText;
-        const id = elem.getAttribute('id');
-        const count = elem.children[3].children[1].innerText
-        
-        const selectedProduct = {id, title, count}
-
-        productsStore.setSelectedProducts(selectedProduct)
+        setProducts(_products)
     }
 
+    const getListRecipes = () => {
+        const _recipes = recipesStore.recipes.map((recipe) => {
+            return { id: recipe.id, value: recipe.title, label: recipe.title}
+        })
 
-    const addCountProductsForRecipe = (e) => {
-        const productId = e.target.previousElementSibling.value;
-        const value = e.target.value;
-
-        //productsStore.setSelectedProducts(newProducts)
+        setRecipes(_recipes)
     }
 
-
-    const addSelectedProducts = () => {
-        const _selectProducts = productsStore.selectedProducts.map()
-
-        setSelectedProducts([...selectedProducts, { title: '', description: '', number: Date.now() }])
-    }
 
 
     // coздать рецепт
-    const addRecipeByClick = async () => {
-        const _products = productsStore.selectedProducts.map(product => {
-            return { id: product.id, title: product.title, count: product.count }
-        })
+    const addRecipeByClick = async (values) => {
+        const prsData = []
 
-        console.log(selectedProducts)
+        for (let i = 0; i < values.goods.length; i++) {
+            for (let j = 0; j < products.length; j++) {
+                if (products[j].value === values.goods[i]) prsData.push({ "productId": products[j].id, "count": 5 })
+            }
+        }
 
-        /*const newProducts = _products.map(product =>
-            product.id === productId ?
-                { ...product, products: { productId: productId, count: value } }
-                : product
+        const newRecepe = {
+            'title': values.title,
+            'description': values.description,
+            'products': prsData
+        }
 
-        ) */
+        await saveRecipe(newRecepe)
 
-        //await saveRecipe(recipeTitle, recipeDescription, selectedProducts)
-        //const recipes = await findAll()
+        const recipes = await findAll()
+        recipesStore.setRecipes(recipes)
 
-        //recipesStore.setRecipes(recipes)
+        // добавление нового количества 
+        const products = await findAllProducts()
+        productsStore.setProducts(products)
 
-        
         setRecipeTitle('')
         setRecipeDescription('')
+        setModalActiveProduct(false)
     }
 
-    // coздать блюдо
-    const addPositionByClick = async () => {
-        const recipeId = recipesStore.selectedRecipe.id;
+    //coздать блюдо
+    const addPositionByClick = async (values) => {
+    
+        const recipeId = recipes.find( recipe => recipe.value === values.recipe).id
 
-        await savePosition(positionTitle, positionDescription, positionImage, +positionPrice, +recipeId, false)
+        const newPosition = {
+            'title': values.title,
+            'description': values.description,
+            'photo': values.photo,
+            'price' : +values.price,
+            'recipeId': +recipeId
+        }
 
+        await savePosition(newPosition)
+
+        setModalActivePosition(false)
+
+        setPositionTitle('')
+        setPositionDescription('')
+        setPositionImage('')
+        setPositionPrice(0)
     }
 
-     
     return (
         <>
             <Title>Админка повара</Title>
             <HeaderWr>
                 <LogoWr><Image src={LogoImg} alt="logo" /></LogoWr>
                 <SubTitle>Cписок продуктов</SubTitle>
-                <Button 
-                    onClick={() => setModalActiveProduct(true)}
-                    padding={"10px"} 
-                    color={"#337EAA"}>
-                            Cоздать рецепт
-                </Button>
+                <div onClick={() => setModalActiveProduct(true)}>
+                    <Button
+                        padding={"10px"}
+                        color={"#337EAA"}
+                        onClick={getListProducts}
+                    >
+                        Cоздать рецепт
+                    </Button>
+                </div>
             </HeaderWr>
-            <ProductList productByClick={selectedProductsByClick} />
+            <ProductList />
             <HeaderWr>
                 <SubTitle>Cписок рецептов</SubTitle>
-                <Button padding={"10px"} color={"#337EAA"} onClick={() => setModalActivePosition(true)}>Создать блюдо по рецепту</Button>
+                <div onClick={() => setModalActivePosition(true)}>
+                    <Button 
+                        padding={"10px"} 
+                        color={"#337EAA"} 
+                        onClick={getListRecipes}
+                    >
+                        Создать блюдо по рецепту
+                    </Button>
+                </div>
             </HeaderWr>
             <RecipeList />
             <Modal>
@@ -149,55 +180,65 @@ const CookPage = observer(() => {
                     <StyledModalContent onClick={(e) => e.stopPropagation()}>
                         <StyledModalTitle>Новый рецепт:</StyledModalTitle>
                         <StyledLabelText>Наименование рецепта:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text" 
-                            value={recipeTitle}
-                            onChange={e => setRecipeTitle(e.target.value)}    
-                            />
-                        <StyledLabelText>Описание рецепта:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text"
-                            value={recipeDescription}
-                            onChange={e => setRecipeDescription(e.target.value)}        
-                            />
-                        <StyledLabelText>ПРОДУКЦИЯ:</StyledLabelText>
-                        {productsStore.selectedProducts.map(el =>
-                            <Div key={el.id}>
-                                <StyledLabelText>{el.title}</StyledLabelText>
-                                <Div>
-                                    <StyledLabelText>Количество:</StyledLabelText>
-                                    <Input type="hidden" value={el.id}/>
-                                    <Input 
-                                        marginLeft={'30px'}
-                                        bg={"#fff"}
+                        <Formik
+                            initialValues={{
+                                title: '',
+                                description: '',
+                                goods: []
+                            }}
+                            onSubmit={(values) => addRecipeByClick(values)}
+                            validationSchema={validationsSchemaRecipe}
+                        >
+                            {({ values, errors, touched, handleChange, handleBlur, isValid, handleSubmit, dirty}) => (
+                                <div>
+                                    <Input bg={"#fff"}
                                         color={"#000"}
                                         size={"13px"}
-                                        padding={"5px 10px"}
+                                        padding={"10px 20px"}
                                         margin={"10px"}
                                         type="text"
-                                        pattern="/\D/g"
-                                        onChange={e => addCountProductsForRecipe(e)}
+                                        name={`title`}
+                                        value={values.title}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
                                     />
-                                </Div>
-                            </Div>
-                        )}
-                        <div onClick={() => setModalActiveProduct(false)}>
-                            <Button
-                                padding={"5px 10px"}
-                                color={"#008C95"}
-                                onClick={addRecipeByClick}
-                            >
-                                Добавить
-                            </Button>
-                        </div>
+                                    {touched.title && errors.title && <StyledError>{errors.title}</StyledError>}
+                                    <StyledLabelText>Описание рецепта:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`description`}
+                                        value={values.description}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.description && errors.description && <StyledError>{errors.description}</StyledError>}
+                                    <StyledLabelText>ПРОДУКЦИЯ:</StyledLabelText>
+                                    <Field
+                                        name={`goods`}
+                                        placeholder="Выбирите список продуктов"
+                                        isMulti={true}
+                                        component={SelectMultuple}
+                                        options={products}
+                                    />
+                                    <div>
+                                        <Button
+                                            disabled={!isValid && !dirty}
+                                            padding={"5px 10px"}
+                                            color={"#008C95"}
+                                            onClick={handleSubmit}
+                                            type={`submit`}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </Formik>
+
                     </StyledModalContent>
                 </StyledModal>
             </Modal>
@@ -206,55 +247,91 @@ const CookPage = observer(() => {
                     <StyledModalContent onClick={(e) => e.stopPropagation()}>
                         <StyledModalTitle>Новое блюдо:</StyledModalTitle>
                         <StyledLabelText>Наименование блюда:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text" 
-                            value={positionTitle}
-                            onChange={e => setPositionTitle(e.target.value)}    
-                            />
-                        <StyledLabelText>Описание блюда:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text" 
-                            value={positionDescription}
-                            onChange={e => setPositionDescription(e.target.value)}    
-                            />
-                        <StyledLabelText>Изображение блюда:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text"
-                            value={positionImage}
-                            onChange={e => setPositionImage(e.target.value)}        
-                            />
-                        <StyledLabelText>Цена:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text"
-                            value={positionPrice}
-                            onChange={e => setPositionPrice(e.target.value)}        
-                            />
-                        <StyledLabelText>Блюдо по рецепту : {recipesStore.selectedRecipe.title}</StyledLabelText>    
-                        <div onClick={() => setModalActivePosition(false)}>
-                            <Button
-                                padding={"5px 10px"}
-                                color={"#008C95"}
-                                onClick={addPositionByClick}
-                            >
-                                Добавить
-                            </Button>
-                        </div>
+                        <Formik
+                            initialValues={{
+                                title: '',
+                                description: '',
+                                photo: '',
+                                price: 0,
+                                recipe: ''
+                            }}
+                            onSubmit={(values) => addPositionByClick(values)}
+                            validationSchema={validationsSchemaPosition}
+                        >
+                            {({ values, errors, touched, handleChange, handleBlur, isValid, handleSubmit, dirty}) => (
+                                <div>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`title`}
+                                        value={values.title}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                     {touched.title && errors.title && <StyledError>{errors.title}</StyledError>}
+                                    <StyledLabelText>Описание блюда:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`description`}
+                                        value={values.description}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.description && errors.description && <StyledError>{errors.description}</StyledError>}
+                                    <StyledLabelText>Изображение блюда:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`photo`}
+                                        value={values.photo}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.photo && errors.photo && <StyledError>{errors.photo}</StyledError>}
+                                    <StyledLabelText>Цена:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`price`}
+                                        value={values.price}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.price && errors.price && <StyledError>{errors.price}</StyledError>}
+                                    <StyledLabelText>РЕЦЕПТЫ:</StyledLabelText>
+                                    <Field
+                                        name={`recipe`}
+                                        placeholder="Выбирите список рецептов"
+                                        isMulti={false}
+                                        component={SelectMultuple}
+                                        options={recipes}
+                                    />
+                                    <div></div>
+                                    <Button
+                                        disabled={!isValid && !dirty}
+                                        padding={"5px 10px"}
+                                        color={"#008C95"}
+                                        onClick={handleSubmit}
+                                        type={`submit`}
+                                    >
+                                        Добавить
+                                    </Button>
+                                </div>
+                            )}
+                        </Formik>
                     </StyledModalContent>
                 </StyledModal>
             </Modal>

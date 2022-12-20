@@ -50,6 +50,7 @@ const Auth = observer(() => {
                 data = await auth(login, password)
 
                 setAuth({
+                    id: data.sub,
                     login: data.login,
                     role: data.role
                 })

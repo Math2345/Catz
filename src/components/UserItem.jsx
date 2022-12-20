@@ -24,7 +24,7 @@ const UserItem = observer(({setActive, user, id, changeRoleById}) => {
             <TableTd>   
                 {user.role.name}
             </TableTd>
-            <TableTd onClick={changeRoleById} userId={userId}>
+            <TableTd onClick={changeRoleById} id={userId}>
                 <Button padding={"10px"} onClick={() => setActive(true)}>Изменить роль</Button>
             </TableTd>
         </TableTr>

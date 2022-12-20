@@ -11,13 +11,15 @@ export const findAllProducts = async () => {
 
 
 export const push = async (id, count) => {
+    console.log(id, count)
     const data = await $host.post(`${SERVER_URL}/product/${id}/push?count=${count}`)
 
     return data
 }
 
 
-export const save = async (name, photo, count) => {
+export const save = async ({name, photo, count}) => {
+    console.log({name, photo, count})
     const {data} = await $host.post(`${SERVER_URL}/product`, {name, photo, count})
 
     return data

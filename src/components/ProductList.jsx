@@ -9,14 +9,21 @@ import ProductItem from "./ProductItem";
 //styles
 import {CartContainer} from  "../styles/styles"
 
-const ProductList = observer(({productByClick}) => {
+const ProductList = observer(({cartRef, productByClick}) => {
     const {productsStore} = useContext(Context)
+
+    const stylePanel = {
+        'marginTop': '10px',
+        'color': '#fff'
+    }
 
     return (
         <CartContainer>
-            {productsStore.products.map((product) => 
+            {productsStore.products.length === 0 ? <div style={stylePanel}>Продуктов пока нет!</div>
+            :
+            productsStore.products.map((product) => 
                 <ProductItem 
-                    key={product.id} 
+                    key={product.id}
                     product={product}
                     productByClick={productByClick} 
                 />

@@ -2,8 +2,8 @@ import { $authHost, $host } from "./index";
 
 import { SERVER_URL } from "../utils/consts";
 
-export const create = async(id) => {
-    const {data} = await $host.get(`${SERVER_URL}/order/create`, {id})
+export const create = async(posObj) => {
+    const {data} = await $host.post(`${SERVER_URL}/order/create`, posObj)
 
     return data
 }

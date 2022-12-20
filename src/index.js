@@ -6,6 +6,7 @@ import UserStore from './store/Userstore';
 import ProductStore from './store/ProductStore';
 import RecipeStore from './store/RecipeStore';
 import PositionStore from './store/PositionStore';
+import CartStore from './store/CartStore';
 import OrderStore from './store/OrderStore';
 
 import styled, { createGlobalStyle } from 'styled-components';
@@ -48,6 +49,7 @@ root.render(
       productsStore: new ProductStore(),
       recipesStore: new RecipeStore(),
       positionsStore: new PositionStore(),
+      cartStore: new CartStore(),
       ordersStore: new OrderStore()
     }}>
       <Global />

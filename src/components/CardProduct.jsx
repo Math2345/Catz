@@ -1,33 +1,38 @@
-import React from "react";
-
+import React, { useContext } from "react";
+import { Context } from "..";
+import { observer } from "mobx-react-lite";
 
 //ui
 import Image from "./UI/Image";
 import {        
             CardInCart, 
-            CardPrice,
             CardInCartCounter,
-            CardInCartCounterRes
+            CardInCartCounterRes,
+            CardTitleInCart,
+            CardPriceInCart
         } 
         
         from "../styles/styles"
 
 import Button from "./UI/Button";
 
-const CardProductItem = observer(({product}) => {
+const CardProductItem = observer(({positionInCart, plusCount, minuisCount, removePositionsInCart}) => {
+    const { cartStore } = useContext(Context)
+
+    const id = positionInCart.id;
 
     return (
-        <CardInCart>
-            <Image src={product.photo} alt={product.title}/>
-            <CardTitle>{product.title}</CardTitle>
-            <CardPrice>Цена {product.price}</CardPrice>
+        <CardInCart id={id}>
+            <Image margin={'0 52px 0 0'} w={"110px"} src={positionInCart.img} alt={positionInCart.title}/>
+            <CardTitleInCart>{positionInCart.title}</CardTitleInCart>
+            <CardPriceInCart>Цена: <br></br>{positionInCart.price}P</CardPriceInCart>
             <CardInCartCounter>
-                <Button>-</Button>
-                <CardInCartCounterRes>1</CardInCartCounterRes>
-                <Button>+</Button>
+                <Button  onClick={() => minuisCount(positionInCart.id)} raduis={'5px 0 0 5px'} size={'14px'} padding={"3px 6px"}>-</Button>
+                <CardInCartCounterRes>{positionInCart.count}</CardInCartCounterRes>
+                <Button  onClick={() => plusCount(positionInCart.id)} raduis={'0 5px 5px 0'} size={'14px'} padding={"3px 6px"}>+</Button>
             </CardInCartCounter>
-            <CardPrice>Итого: {product.price}</CardPrice>
-            <Button padding={"10px"}>Удалить</Button>
+            <CardPriceInCart>Итого: <br></br>{positionInCart.totalPrice}P</CardPriceInCart>
+            <Button w={'inherit'} padding={"10px"} onClick={() => removePositionsInCart(positionInCart.id)}>Удалить</Button>
         </CardInCart>
     )
 })

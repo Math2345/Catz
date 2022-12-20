@@ -1,13 +1,14 @@
 import React from "react";
 
 
-const Select = ({changeSelect, roles}) => {
-    const options = roles.map((role, index) => {
-        return <option value={index} key={index}>{role}</option>
+const Select = ({changeSelect, elems}) => {
+    const options = elems.map((elem, index) => {
+        return <option value={index} key={index}>{elem}</option>
     })
 
     return (
         <select onChange={changeSelect}>
+            <option selected disabled>Выберите пункт</option>
             {options}   
         </select>
     )

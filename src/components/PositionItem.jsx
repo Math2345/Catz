@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React from "react";
+import React, {useRef} from "react";
 
 //ui
 import Image from "./UI/Image";
@@ -11,13 +11,14 @@ import {
 import Button from "./UI/Button";
 
 const PositionItem = observer(({position, addPositionToCart}) => {
+    const id = position.id;
 
     return (
-        <Card>
+        <Card id={id} onClick={addPositionToCart}>
             <Image src={position.photo} alt={position.title}/>
             <CardTitle>{position.title}</CardTitle>
-            <CardPrice>{position.price}</CardPrice>
-            <Button padding={"5px 10px"} onClick={addPositionToCart}>В корзину</Button>
+            <CardPrice>{position.price}P</CardPrice>
+            <Button w = {'inherit'} padding={"5px 10px"}>Добавить</Button>
         </Card>
     )
 })

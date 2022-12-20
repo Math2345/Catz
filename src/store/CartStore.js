@@ -1,39 +1,35 @@
-import {makeAutoObservable} from "mobx"
+import { makeAutoObservable } from "mobx"
 
 
 export default class CartStore {
     constructor() {
-        this._items = []
+        this._positionsInCart = []
         this._totalPrice = 0;
         this._totalCount = 0;
         makeAutoObservable(this)
     }
 
-    addProductInCart(id) {
-
+    addPositionInCart(elems) {
+        this._positionsInCart = elems
     }
 
-
-    removeProductFromCart() {
-
+    positionsInCart() {
+        return this._positionsInCart
     }
 
-
-    plusCartItem() {
-
+    setTotalPrice(price) {
+        this._totalPrice = price
     }
 
-
-    minusCartItem() {
-
+    getTotalPrice() {
+        return this._totalPrice
     }
 
-
-    _updateData() {
-
+    getTotalCount() {
+        return this._totalCount
     }
 
-    clearCart() {
-
+    setTotalCount(count) {
+        this._totalCount = count
     }
 }

@@ -60,4 +60,10 @@
   .react-tabs__tab:focus:after {
     content: none;
   }
+
+
+  .react-select-container,
+  .css-b62m3t-container {
+      margin-bottom: 30px;
+  }
   

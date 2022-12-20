@@ -3,7 +3,7 @@ import {makeAutoObservable} from "mobx"
 
 export default class PositionStore {
     constructor() {
-        this._positions = {}
+        this._positions = []
         makeAutoObservable(this)
     }
 

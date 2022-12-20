@@ -1,3 +1,4 @@
+import * as yup from 'yup'
 export const SERVER_URL = 'http://localhost:8080'
 
 
@@ -24,6 +25,36 @@ export const NEWROLES = [
     "Повар",
     "Доставщик"
 ]
+
+export const FILTERNAME= [
+    "Вcе",
+    "Клиент",
+    "Повар",
+    "Доставщик"
+]
+
+export const STATUS = ["ACCEPTED", "READY"]
+export const NEWSTATUS = ["Создан", "Готов"]
+
+
+
+export const validationsSchemaProduct = yup.object().shape({
+    name: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+    photo: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+    count: yup.number().typeError('Должно быть числом').required('Это поле обязательно').positive('Введите число больше 0')
+})
+
+export const validationsSchemaRecipe = yup.object().shape({
+   title: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+   description: yup.string().typeError('Должно быть строкой').required('Это поле обязательно')
+})
+
+export const validationsSchemaPosition = yup.object().shape({
+    title: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+    description: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+    photo: yup.string().typeError('Должно быть строкой').required('Это поле обязательно'),
+    price: yup.number().typeError('Должно быть числом').required('Это поле обязательно').positive('Введите число больше 0')
+ })
 
 
 

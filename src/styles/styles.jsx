@@ -68,15 +68,22 @@ export const StyledModalTitle = styled.div`
 `;
 
 export const StyledLabelText = styled.div`
-    margin-bottom: 5px;
-    font-size: 12px;
+    margin-bottom: ${({margin = '5px'}) => margin};
+    font-size: ${({size = '12px'}) => size};
     color: #fff;
+
+    display: flex;
+    justify-content: space-between;
 `;
 
 export  const HeaderWr= styled.div`
     margin-bottom: 50px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
+
+    position: relative;
+
 `;
 
 
@@ -84,7 +91,7 @@ export  const HeaderWr= styled.div`
 
 export const StyledButton = styled.button`
     display: block;
-    margin-left: auto;
+    margin-left: ${({w = 'auto'}) => w};
 
     padding: ${({padding}) => padding};
     font-size: ${({size = '16px'}) => size};
@@ -95,19 +102,26 @@ export const StyledButton = styled.button`
     border: none;
     border-radius: ${({raduis = '5px'}) => raduis};
     color: #FFF;
-    cursor: pointer;       
+    cursor: pointer;      
+    
+    &[disabled] {
+        opacity: .5;
+    }
 `;
 
 
 export const StyledImage = styled.img`
-    max-width: 100%;
-    height: 100%;
+    display: block;
+    max-width:  ${({w = '260px'}) => w};
+    width: 100%;
+    height: auto;
+    margin: ${({margin = '0 auto'}) => margin};
 `;
 
 export const StyledInput = styled.input`
     margin-bottom: ${({margin}) => margin};
     margin-left: ${({marginLeft = '0px'}) => marginLeft};
-    width: 100%;
+    width: ${({width= '100%'}) => width};
     padding: ${({padding}) => padding};
     font-size: ${({size}) => size};
     border: 1px solid #E0E0E0;
@@ -116,7 +130,7 @@ export const StyledInput = styled.input`
     color:  ${({color}) => color};
 `;
 
-export const StyledSubTitle = styled.h1`FH
+export const StyledSubTitle = styled.h1`
     font-style: normal;
     font-weight: 500;
     font-size: 2.25rem;
@@ -130,9 +144,15 @@ export const StyledTitle = styled.h1`
     color: #fff;
 `;
 
+export const StyledError = styled.div`
+    margin-bottom: 10px;
+    color: #FF0000;
+`
+
 // table data
 
 export const Table = styled.table`
+    width: 100%;
     align-self: stretch;
 `
 
@@ -149,8 +169,8 @@ export const TableTh = styled.th`
     font-weight: bold;
 `
 
-export const TableTd = styled.td.attrs(({userId}) => ({
-    id: userId
+export const TableTd = styled.td.attrs(({id}) => ({
+    id: id
 }))`
     width: 50%;
 `
@@ -158,17 +178,19 @@ export const TableTd = styled.td.attrs(({userId}) => ({
 // product
 
 export const CartContainer = styled.div`
-    margin-bottom: 100px;
-    display: flex;
-    flex-wrap: wrap;
+    margin-bottom: 65px;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: ${({сolumn = '1fr 1fr 1fr 1fr'}) => сolumn};
+    grid-gap: 3vw;
 `
 
-export const Card = styled.div.attrs(({id}) => ({
-    id: id
+export const Card = styled.div.attrs(({id, count}) => ({
+    id: id,
+    size: count
 }))`
-    margin-right: 20px;
     margin-bottom: 20px;
-    width: ${({per = '23%'}) => per};
+    width: ${({per = '100%'}) => per};
     padding: 20px;
     height: 100%;
 
@@ -176,6 +198,10 @@ export const Card = styled.div.attrs(({id}) => ({
     background: linear-gradient(180deg, #001E29 0%, #002735 20.83%, #002F40 100%);
     border-radius: 5px;
     cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 `
 export const CardTitle = styled.div`
     margin-bottom: 10px;
@@ -185,6 +211,15 @@ export const CardTitle = styled.div`
     color: #fff;
     text-align: center;
 `
+
+export const CardTitleInCart = styled.div`
+    margin-right: 52px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    color: #fff;
+`
+
 export const CardDescription = styled.div`
     margin-bottom: 10px;
     font-size: 16px;
@@ -195,10 +230,20 @@ export const CardDescription = styled.div`
 
 export const CardPrice = styled.div`
     margin-bottom: 25px;
+    text-align: center;
     font-size: 17px;
     font-weight: 700;
     line-height: 17px;
+    color: #fff;
 `
+export const CardPriceInCart = styled.div`
+    margin-right: 52px;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 18px;
+    color: #fff;
+`
+
 export const CardClose = styled.div`
     position: absolute;
     top: 6px;
@@ -212,23 +257,34 @@ export const CardClose = styled.div`
 `
 
 export const Div = styled.div`
+    margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
 `
 
 //cartProduct
 
-export const CardInCart = styled.div`
+export const CardInCart = styled.div.attrs(({id}) => ({
+    id: id
+}))`
     width: 100%;
 
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
 `
 export const CardInCartCounter = styled.div`
+    margin-right: 75px;
     display: flex;
-    flex-wrap: wrap;
 `
 export const CardInCartCounterRes = styled.div`
     width: 30px;
     height: 26px;
-    background: #337EAA;
+    background: #63A4CB;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
 `

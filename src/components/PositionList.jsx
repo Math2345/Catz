@@ -12,13 +12,15 @@ import {CartContainer} from  "../styles/styles"
 const ProductList = observer(({addPositionToCart}) => {
     const {positionsStore} = useContext(Context)
 
-    positionsStore.positions.map((position) => 
-       console.log(position)          
-    );
+    const stylePanel = {
+        'marginTop': '10px',
+        'color': '#fff'
+    }
 
     return (
         <CartContainer>
-            {positionsStore.positions.map((position) => 
+            {positionsStore.positions.length === 0 ? <div style={stylePanel}>Блюд пока нет!</div>
+            : positionsStore.positions.map((position) => 
                 <PositionItem 
                     key={position.id} 
                     position={position}

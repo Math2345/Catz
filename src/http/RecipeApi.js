@@ -2,7 +2,7 @@ import { $authHost, $host } from "./index";
 
 import { SERVER_URL } from "../utils/consts";
 
-export const saveRecipe = async(title, description, products) => {
+export const saveRecipe = async({title, description, products}) => {
     const data = await $host.post(`${SERVER_URL}/recipe`, {title, description, products})
 }
 

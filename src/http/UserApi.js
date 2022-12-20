@@ -34,6 +34,12 @@ export const findById = async (id) => {
     return response.data
 }
 
+export const userByRole = async (role) => {
+    const response = await $host.get(`${SERVER_URL}/user/role/by-role?roleName=${role}`)
+
+    return response.data
+}
+
 
 
 

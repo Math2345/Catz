@@ -1,10 +1,11 @@
 import { observer } from "mobx-react-lite";
-import React, {useState, useContext} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Context } from "..";
 
-//http
-import { findAllProducts, save } from "../http/ProductApi";    
+import { Formik } from 'formik'
 
+//http
+import { findAllProducts, save } from "../http/ProductApi";
 
 // modal
 import Modal from "../components/Modal/Modal";
@@ -18,7 +19,6 @@ import Image from "../components/UI/Image";
 import Input from "../components/UI/Input";
 import Button from "../components/UI/Button";
 
-
 // logo
 import LogoImg from "../static/image/logo.svg";
 
@@ -28,36 +28,40 @@ import {
     StyledModal,
     StyledModalContent,
     StyledModalTitle,
-    StyledLabelText
+    StyledLabelText,
+    StyledError
 
-} 
-from "../styles/styles"
-import { useEffect } from "react";
+}  from "../styles/styles"
+
+// const 
+import {validationsSchemaProduct } from "../utils/consts";
 
 
 const DeliverPage = observer(() => {
-    const {productsStore} = useContext(Context)
+    const { productsStore } = useContext(Context)
 
     const [modalActive, setModalActive] = useState(false)
     const [productTitle, setProductTitle] = useState('')
     const [productImage, setProductImage] = useState('')
     const [productCount, setProductCount] = useState(0)
 
+
     useEffect(() => {
         findAllProducts().then(data => productsStore.setProducts(data));
     }, [])
 
 
-    const saveProductByClick = async () => {
-        await save(productTitle, productImage, productCount)
+    const saveProductByClick = async (values) => {
+        await save(values)
 
         const products = await findAllProducts()
-
         productsStore.setProducts(products)
 
         setProductTitle('')
         setProductImage('')
         setProductCount('')
+
+        setModalActive(false)
     }
 
     const removeProductByClick = (e) => {
@@ -70,7 +74,7 @@ const DeliverPage = observer(() => {
 
         productsStore.setProducts(filterProducts)
     }
-     
+
     return (
         <>
             <HeaderWr>
@@ -78,53 +82,79 @@ const DeliverPage = observer(() => {
                 <SubTitle>Продукция</SubTitle>
                 <Button padding={"10px"} color={"#337EAA"} onClick={() => setModalActive(true)}>Добавить продукцию</Button>
             </HeaderWr>
-            <ProductList removeProductByClick={removeProductByClick}/>
+            <ProductList removeProductByClick={removeProductByClick} />
             <Modal>
                 <StyledModal active={modalActive} onClick={() => setModalActive(false)}>
                     <StyledModalContent onClick={(e) => e.stopPropagation()}>
                         <StyledModalTitle>Новый продукт</StyledModalTitle>
                         <StyledLabelText>Наименование продукта:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text" 
-                            value={productTitle}
-                            onChange={e => setProductTitle(e.target.value)}    
-                            />
-                        <StyledLabelText>Изображение продукта:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text"
-                            value={productImage}
-                            onChange={e => setProductImage(e.target.value)}        
-                            />
-                        <StyledLabelText>Количество:</StyledLabelText>
-                        <Input bg={"#fff"}
-                            color={"#000"}
-                            size={"13px"}
-                            padding={"10px 20px"}
-                            margin={"10px"}
-                            type="text"
-                            value={productCount}
-                            onChange={e => setProductCount(e.target.value)}        
-                            />
-                        <div onClick={() => setModalActive(false)}>
-                            <Button
-                                onClick={saveProductByClick}
-                                padding={"5px 10px"}
-                                color={"#008C95"}>
-                                Добавить
-                            </Button>
-                        </div>
+                        <Formik
+                            initialValues={{
+                                name: '',
+                                photo: '',
+                                count: ''
+                            }}
+                            onSubmit={(values) => saveProductByClick(values)}
+                            validationSchema={validationsSchemaProduct}
+                        >
+                            {({ values, errors, touched, handleChange, handleBlur, isValid, handleSubmit, dirty }) => (
+                                <div>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`name`}
+                                        value={values.name}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.name && errors.name && <StyledError>{errors.name}</StyledError>}
+                                    <StyledLabelText>Изображение продукта:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`photo`}
+                                        value={values.photo}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.photo && errors.photo && <StyledError>{errors.photo}</StyledError>}
+                                    <StyledLabelText>Количество:</StyledLabelText>
+                                    <Input bg={"#fff"}
+                                        color={"#000"}
+                                        size={"13px"}
+                                        padding={"10px 20px"}
+                                        margin={"10px"}
+                                        type="text"
+                                        name={`count`}
+                                        value={values.count}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                    {touched.count && errors.count && <StyledError>{errors.count}</StyledError>}
+                                    <div>
+                                        <Button
+                                            disabled={!isValid && !dirty}
+                                            onClick={handleSubmit}
+                                            padding={"5px 10px"}
+                                            color={"#008C95"}
+                                            type={`submit`}
+                                        >
+                                            Добавить
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </Formik>
                     </StyledModalContent>
                 </StyledModal>
-            </Modal>  
-            
+            </Modal>
+
         </>
     )
 })

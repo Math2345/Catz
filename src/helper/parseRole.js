@@ -15,5 +15,9 @@ export const parseRoleToNewRole = (users, newroles) => {
 }
 
 export const parseNewRoleToRole = (roles, index) => {
-    return roles[index]
+    return roles[index - 1]
+}
+
+export const parseNewStatusToStatus = (statuses, index) => {
+    return statuses[index - 1]
 }
