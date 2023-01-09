@@ -1,7 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { Context } from "..";
 
 import useAuth from "../hooks/useAuth";
 
@@ -54,6 +53,10 @@ const Auth = observer(() => {
                     login: data.login,
                     role: data.role
                 })
+
+                sessionStorage.setItem('id', data.sub)
+                sessionStorage.setItem('login', data.login)
+                sessionStorage.setItem('role', data.role)
 
 
                 if (data.role === 'ROLE_ADMIN') {

@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
+import { useNavigate } from 'react-router-dom'
 
 import { observer } from "mobx-react-lite";
 import { Context } from "..";
@@ -6,7 +7,7 @@ import { Context } from "..";
 import 'react-tabs/style/react-tabs.css';
 
 // roles and status
-import { NEWROLES, ROLES, STATUS, NEWSTATUS, FILTERNAME } from "../utils/consts"
+import { NEWROLES, ROLES, STATUS, NEWSTATUS, FILTERNAME, UNAUTHORIZED_ROUTE } from "../utils/consts"
 
 
 // api 
@@ -61,6 +62,8 @@ const Admin = observer(() => {
 
     const [modalActiveFilter, setModalActiveFilter] = useState(false)
     const [selectedUserByRole, setSelectedUserByRole] = useState('')
+
+    const navigate = useNavigate()
 
 
     useEffect(() => {
@@ -180,13 +183,19 @@ const Admin = observer(() => {
             return;
         } 
 
-        console.log(selectedUserByRole)
-
         const usersByRole = await userByRole(selectedUserByRole)
         usersStore.addUsers(usersByRole)
 
         setModalActiveFilter(false)
-    }   
+    } 
+    
+    const logoout = () => {
+        sessionStorage.setItem('id', '')
+        sessionStorage.setItem('login', '')
+        sessionStorage.setItem('role', '')
+
+        navigate(UNAUTHORIZED_ROUTE)
+    }
 
 
     return (
@@ -196,6 +205,12 @@ const Admin = observer(() => {
             </ContainerHeader>
             <ShopHeaderWr>
                 <LogoWr><Image src={LogoImg} alt="logo"/></LogoWr>
+                <Button
+                                padding={"5px 10px"}
+                                color={"#000"}
+                                onClick={logoout}
+                    >           Выйти из аккаунта
+                </Button>
             </ShopHeaderWr>
             <div><Button
                             padding={"5px 10px"}

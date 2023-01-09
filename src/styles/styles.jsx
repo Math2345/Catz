@@ -92,7 +92,7 @@ export  const HeaderWr= styled.div`
 export const StyledButton = styled.button`
     display: block;
     margin-left: ${({w = 'auto'}) => w};
-
+    margin-bottom: ${({ml = '0px'}) => ml};
     padding: ${({padding}) => padding};
     font-size: ${({size = '16px'}) => size};
     background-image: ${({image}) => image ? `url(${image})` : 'none'};

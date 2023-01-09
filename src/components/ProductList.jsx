@@ -9,7 +9,7 @@ import ProductItem from "./ProductItem";
 //styles
 import {CartContainer} from  "../styles/styles"
 
-const ProductList = observer(({cartRef, productByClick}) => {
+const ProductList = observer(({addProductCountByClick}) => {
     const {productsStore} = useContext(Context)
 
     const stylePanel = {
@@ -25,7 +25,7 @@ const ProductList = observer(({cartRef, productByClick}) => {
                 <ProductItem 
                     key={product.id}
                     product={product}
-                    productByClick={productByClick} 
+                    addProductCountByClick={addProductCountByClick} 
                 />
             )}
         </CartContainer>

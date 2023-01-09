@@ -3,6 +3,7 @@ import React, { useState, useContext, useEffect} from "react";
 import { Context } from "..";
 
 import { Formik, Field } from 'formik'
+import { useNavigate } from 'react-router-dom'
 
 //http
 import { findAllProducts, push } from "../http/ProductApi";
@@ -41,10 +42,11 @@ import {
 import ProductList from "../components/ProductList";
 import RecipeList from "../components/RecipeList";
 
-import { validationsSchemaRecipe, validationsSchemaPosition } from "../utils/consts";
+import { validationsSchemaRecipe, validationsSchemaPosition,  UNAUTHORIZED_ROUTE  } from "../utils/consts";
 
 
 const CookPage = observer(() => {
+    const navigate = useNavigate()
     const { productsStore } = useContext(Context)
     const { recipesStore } = useContext(Context)
 
@@ -108,18 +110,21 @@ const CookPage = observer(() => {
             'products': prsData
         }
 
+
         await saveRecipe(newRecepe)
 
         const recipes = await findAll()
         recipesStore.setRecipes(recipes)
 
         // добавление нового количества 
-        const products = await findAllProducts()
-        productsStore.setProducts(products)
+        //const products = await findAllProducts()
+        //productsStore.setProducts(products)
 
         setRecipeTitle('')
         setRecipeDescription('')
         setModalActiveProduct(false)
+
+        console.log(products)
     }
 
     //coздать блюдо
@@ -145,22 +150,39 @@ const CookPage = observer(() => {
         setPositionPrice(0)
     }
 
+    const logoout = () => {
+        sessionStorage.setItem('id', '')
+        sessionStorage.setItem('login', '')
+        sessionStorage.setItem('role', '')
+
+        navigate(UNAUTHORIZED_ROUTE)
+    }
+
     return (
         <>
             <Title>Админка повара</Title>
             <HeaderWr>
                 <LogoWr><Image src={LogoImg} alt="logo" /></LogoWr>
-                <SubTitle>Cписок продуктов</SubTitle>
-                <div onClick={() => setModalActiveProduct(true)}>
+                <div style={{'marginRight': 'auto'}}>
+                    <SubTitle>Cписок продуктов</SubTitle>
+                </div>
+            </HeaderWr>
+            <div onClick={() => setModalActiveProduct(true)} style={{'display': 'flex', 'justifyContent': 'space-between'}}>
                     <Button
+                        w={"0px"}
                         padding={"10px"}
                         color={"#337EAA"}
                         onClick={getListProducts}
                     >
                         Cоздать рецепт
                     </Button>
+                    <Button
+                                    padding={"5px 10px"}
+                                    color={"#000"}
+                                    onClick={logoout}
+                        >           Выйти из аккаунта
+                    </Button>
                 </div>
-            </HeaderWr>
             <ProductList />
             <HeaderWr>
                 <SubTitle>Cписок рецептов</SubTitle>

@@ -14,7 +14,7 @@ import {
         } from "../styles/styles"
 
 
-const ProductItem = observer(({product, productByClick}) => {
+const ProductItem = observer(({product, addProductCountByClick}) => {
     const id = product.id;
 
     const style = {
@@ -23,8 +23,8 @@ const ProductItem = observer(({product, productByClick}) => {
     }
 
     return (
-        <Card id={id} onClick={productByClick}>
-            <CardClose onClick={productByClick} src={close}></CardClose> 
+        <Card id={id} onClick={addProductCountByClick}>
+            <CardClose></CardClose> 
             <Image src={product.photo} alt={product.name}/>
             <CardTitle>{product.name}</CardTitle>
             <div style={style}>

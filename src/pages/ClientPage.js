@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { findAll } from "../http/PositionApi";
 
 //pages
-import { CART_ROUTE } from "../utils/consts";
+import { CART_ROUTE, UNAUTHORIZED_ROUTE } from "../utils/consts";
 
 
 // ui
@@ -149,6 +149,14 @@ const ClientPage = observer(() => {
         color: '#fff'
     }
 
+    const logoout = () => {
+        sessionStorage.setItem('id', '')
+        sessionStorage.setItem('login', '')
+        sessionStorage.setItem('role', '')
+
+        navigate(UNAUTHORIZED_ROUTE)
+    }
+
 
     return (
         <>
@@ -171,6 +179,12 @@ const ClientPage = observer(() => {
                 Вы вошли как <b>{login}</b>
               </div>
             </HeaderWr>
+            <Button
+                                    padding={"5px 10px"}
+                                    color={"#000"}
+                                    onClick={logoout}
+                        >           Выйти из аккаунта
+            </Button>
             <PositionList addPositionToCart={addPositionToCart}/>
             <Modal>
                 <StyledModal active={modalSuccessPos} onClick={() => setModalSuccessPos(false)}>

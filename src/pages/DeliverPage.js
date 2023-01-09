@@ -1,11 +1,12 @@
 import { observer } from "mobx-react-lite";
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "..";
+import { useNavigate } from 'react-router-dom'
 
 import { Formik } from 'formik'
 
 //http
-import { findAllProducts, save } from "../http/ProductApi";
+import { findAllProducts, push, save } from "../http/ProductApi";
 
 // modal
 import Modal from "../components/Modal/Modal";
@@ -34,10 +35,11 @@ import {
 }  from "../styles/styles"
 
 // const 
-import {validationsSchemaProduct } from "../utils/consts";
+import {validationsSchemaProduct, UNAUTHORIZED_ROUTE } from "../utils/consts";
 
 
 const DeliverPage = observer(() => {
+    const navigate = useNavigate()
     const { productsStore } = useContext(Context)
 
     const [modalActive, setModalActive] = useState(false)
@@ -64,15 +66,24 @@ const DeliverPage = observer(() => {
         setModalActive(false)
     }
 
-    const removeProductByClick = (e) => {
-        const elem = e.currentTarget.parentNode;
+    const addProductCountByClick = async(e) => {
+        const elem = e.currentTarget;
         const id = elem.getAttribute('id');
 
-        const filterProducts = productsStore.products.filter(el => {
-            return el.id !== +id
-        })
+        await push(id, 100)
 
-        productsStore.setProducts(filterProducts)
+
+        const products = await findAllProducts()
+
+        productsStore.setProducts(products)
+    }
+
+    const logoout = () => {
+        sessionStorage.setItem('id', '')
+        sessionStorage.setItem('login', '')
+        sessionStorage.setItem('role', '')
+
+        navigate(UNAUTHORIZED_ROUTE)
     }
 
     return (
@@ -81,8 +92,16 @@ const DeliverPage = observer(() => {
                 <LogoWr><Image src={LogoImg} alt="logo" /></LogoWr>
                 <SubTitle>Продукция</SubTitle>
                 <Button padding={"10px"} color={"#337EAA"} onClick={() => setModalActive(true)}>Добавить продукцию</Button>
+                <div style={{'marginLeft': '20px'}}>
+                    <Button
+                                    padding={"5px 10px"}
+                                    color={"#000"}
+                                    onClick={logoout}
+                        >           Выйти из аккаунта
+                    </Button>
+                </div>
             </HeaderWr>
-            <ProductList removeProductByClick={removeProductByClick} />
+            <ProductList addProductCountByClick={addProductCountByClick} />
             <Modal>
                 <StyledModal active={modalActive} onClick={() => setModalActive(false)}>
                     <StyledModalContent onClick={(e) => e.stopPropagation()}>

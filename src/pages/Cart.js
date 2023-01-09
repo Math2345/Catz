@@ -1,4 +1,5 @@
 import React, {useContext} from "react";
+import { useNavigate } from 'react-router-dom'
 
 import { Context } from "..";
 
@@ -34,8 +35,12 @@ import { useState } from "react";
 //http
 import { create } from "../http/OrderApi";
 
+import { UNAUTHORIZED_ROUTE  } from "../utils/consts";
+
+
 
 const CART = observer(() => {
+    const navigate = useNavigate()
     const {cartStore} = useContext(Context)
 
     const [items, setItems] = useState([])
@@ -120,6 +125,14 @@ const CART = observer(() => {
         setModalOrder(false)
     }
 
+    const logoout = () => {
+        sessionStorage.setItem('id', '')
+        sessionStorage.setItem('login', '')
+        sessionStorage.setItem('role', '')
+
+        navigate(UNAUTHORIZED_ROUTE)
+    }
+
     const stylesTable = {
         width: '100%',
         color: '#fff',
@@ -140,6 +153,12 @@ const CART = observer(() => {
             <ShopHeaderWr>
                 <LogoWr><Image src={LogoImg} alt="logo"/></LogoWr>
                 <Title>Корзина</Title>
+                <Button
+                                    padding={"5px 10px"}
+                                    color={"#000"}
+                                    onClick={logoout}
+                        >           Выйти из аккаунта
+            </Button>
             </ShopHeaderWr>
             <CardProductList 
                 items={items}
