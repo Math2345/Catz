@@ -4,7 +4,8 @@ import { observer } from "mobx-react-lite";
 
 import useAuth from "../hooks/useAuth";
 
-import { 
+import {
+        REGISTRATION_ROUTE,
         LOGIN_ROUTE, 
         ADMIN_ROUTE, 
         CLIENT_ROUTE, 
@@ -27,6 +28,7 @@ import Button from "../components/UI/Button";
 
 // styles
 import { ContainerHeader, ContainerAuth } from "../styles/styles"
+import "../styles/custom.css"
 
 
 const Auth = observer(() => {
@@ -89,6 +91,15 @@ const Auth = observer(() => {
         }
     }
 
+    const toReg = () => {
+        navigate(REGISTRATION_ROUTE)
+    }
+
+    const toLog = () => {
+        navigate(LOGIN_ROUTE)
+    }
+
+
     return (
         <>
             <ContainerAuth>
@@ -109,6 +120,11 @@ const Auth = observer(() => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                 />
+                <div style={{'color': '#fff'}}>
+                    {isLogin ? <span onClick={toReg} style={{'textDecoration': 'underline', 'cursor': 'pointer'}}>Регистрация</span>
+                            : <div>Уже есть на сайте? <span onClick={toLog} style={{'textDecoration': 'underline', 'cursor': 'pointer'}}>Войти</span></div>
+                    }
+                </div>
                 <Button padding={"15px 30px"} onClick={authClick}>
                     {isLogin ? 'Войти' : 'Зарегистрироваться'}
                 </Button>

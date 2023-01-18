@@ -10,7 +10,7 @@ import RequireAuth from "./RequireAuth";
 
 //routing
 import { publicRoutes, protectedRoutes } from "../routes";
-import { PAGE404_ROUTE } from "../utils/consts"
+import { LOGIN_ROUTE } from "../utils/consts"
 
 
 // styles
@@ -42,7 +42,7 @@ const AppRouter = () => {
                         </Route>
                     )}
 
-                    <Route path="*" element={<Navigate to={PAGE404_ROUTE} />} />
+                    <Route path="*" element={<Navigate to={LOGIN_ROUTE} />} />
                 </Routes>
             </Container>
         </AppWrapper>
